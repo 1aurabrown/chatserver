@@ -1,11 +1,11 @@
 var connAttributes = [] ;
 var connections = [] ;
 
-
 /*Required for creating server*/
 var net = require('net'); 
 /*Server parameter file*/
 var serverConfig = require('./config/server/server.js');
+var broadcast = require('./include/client/broadcast.js');
 /*create server*/
 var server = net.createServer(newConnection) ;
 /*Function to be called when someone new connects to the server*/
@@ -20,37 +20,14 @@ function newConnection(connection)
 	connAttributes.push (connection.remotePort+connection.remoteAddress);    /*Index x is id*/
 	connAttributes.push ("");	/*Place where Nick will be stored*/		 /*index x + 1 is nick*/
 	connAttributes.push("n") ;	/*No Nick diclared as of now*/			 /*index x + 2 is wheather nick for index x id is set or not*/
-
 	connections.push(connection) ;
 	remoteAddress=connection.remoteAddress ;
-	connection.on('data' , function (data) { sendData (data,connection) ; } ) ;
+	connection.on('data' , function (data) { broadcast.sendData (data,connection, connAttributes, connections) ; } ) ;
 	connection.on('end' , function() { endConnection(connection);  });
 	/*connection.end("Bye Bye, have a nice day !!\n") ;*/
 };
 
-function sendData (data, connection)
-{ 	
-	for (var i=0; i < connections.length ; i++)  /*need to be abstracted later*/
-	{	var index = connAttributes.indexOf(connection.remotePort+connection.remoteAddress) ;
-		if (connections[i] != connection && connAttributes[index+2] == "y")	/*If my identity is known then let everyone see my chat*/	
-	
-		{
-			connections[i].write( connAttributes[index+1] + " from " + connections[i].remotePort + "@" + connections[i].remoteAddress + " : " +  data + " \n") ;		
-		}
-		if (connections[i] == connection && connAttributes[index+2] == "n")	/*if my identity is not known then set my first input as my nick even if its empty*/
-		{
-			connAttributes[index+1] = data ;
-			connAttributes[index+2] = "y" ;		
-			/*connection.write("set") ;*/
-			/* Let evertone knows who entered -- Need to be abstracted later*/
-			for (var i=0; i < connections.length ; i++)
-			{
-				connections[i].write( connAttributes[index+1] + " from " + connections[i].remotePort + "@" + connections[i].remoteAddress + " : " +  "just now entered the IRC chat server" + " \n") ;
-			}
-		}
-					
-	}
-};
+
 
 function endConnection(connection) 
 { 
