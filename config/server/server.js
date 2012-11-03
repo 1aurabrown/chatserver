@@ -4,7 +4,7 @@ var serverAdd = "localhost" ;
 
 exports.getServerPort = function() /*variable not global, need a function call similar to get/set method in java*/
 {
-	return serverPort , serverAdd;
+	return serverPort ;
 } ;
 
 
