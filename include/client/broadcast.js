@@ -1,11 +1,10 @@
 var logdb = require('../database/logdb.js');
 
-
 exports.sendData = function (data, connection, connAttributes, connections)
-{ 	data = String(data).replace(/(\r\n|\n|\r)/gm,"");
+{ 	data = String(data).replace(/(\r\n|\n|\r)/gm,"");				/*remove unwanted newline character multiple times and multiple location*/	
 	var index = connAttributes.indexOf(connection.remotePort+connection.remoteAddress) ;
 	logdb.save(connAttributes[index+1], data, connection.remoteAddress+connection.remoteAddress) ;	
-	for (var i=0; i < connections.length ; i++)  /*need to be abstracted later*/
+	for (var i=0; i < connections.length ; i++)  					/*need to be abstracted later*/
 	{	var index = connAttributes.indexOf(connection.remotePort+connection.remoteAddress) ;
 		if (connections[i] != connection && connAttributes[index+2] == "y")	/*If my identity is known then let everyone see my chat*/	
 	
