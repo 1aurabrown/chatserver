@@ -45,15 +45,25 @@ function newConnection(connection)
 
 
 
-function endConnection(connection) 
+function endConnection(connection)  			
 { 
 	var index = connections.indexOf(connection) ;		/*delete function NOT working need to reverify. */
+	var attribute = connection.remotePort+connection.remoteAddress ; /*first delete user from the list and then remove it from the connection attribute array*/
 	connections.splice(index,1) ;				/*Remove the connection from the array if closed*/
+	index = connAttributes.indexOf(attribute) ;	/*remove the attributes if the user has left*/
+	connAttributes.splice(index,3) ;		/*remove all the details of the user*/
 	connection.end("Bye Bye, have a nice day !!\n") ; 
 	broadcast.sendData ("User left the conversation", connection, connAttributes, connections)  ;	/*Let everyone know who left the conversation*/
 }
 
+
+exports.endConnection = function (connection) { endConnection(connection) } ;	/*Allow ending the connection from other scripts also based on input entered by the user*/
+
 /*bind the server to listen to a particular port that is set in the config file*/
 server.listen(serverConfig.getServerPort(), serverConfig.getServerAdd()) ;
+
+
+
+
 
 
